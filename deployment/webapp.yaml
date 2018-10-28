@@ -1,0 +1,56 @@
+kind: Deployment
+apiVersion: extensions/v1beta1
+metadata:
+  name: kubexample
+spec:
+  revisionHistoryLimit: 3
+  template:
+    metadata:
+       labels:
+          app: kubexample
+    spec:
+      containers:
+        - name: kubexample
+          image: kubexample:latest
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 80
+            timeoutSeconds: 1
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 80
+            timeoutSeconds: 1
+      imagePullSecrets:
+        - name: regcred
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: kubexample
+spec:
+  ports:
+  -
+    name: http
+    port: 80
+    targetPort: 80
+    protocol: TCP
+  selector:
+    app: kubexample
+---
+kind: Ingress
+apiVersion: extensions/v1beta1
+metadata:
+  name: kubexample
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+spec:
+  rules:
+  - host: kubexample.localhost
+    http:
+      paths:
+      - path: /
+        backend:
+          serviceName: kubexample
+          servicePort: 80
