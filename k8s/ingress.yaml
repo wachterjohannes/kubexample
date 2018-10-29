@@ -1,0 +1,15 @@
+kind: Ingress
+apiVersion: extensions/v1beta1
+metadata:
+  name: {{service.name}}
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+spec:
+  rules:
+  - host: {{service.name}}.localhost
+    http:
+      paths:
+      - path: /*
+        backend:
+          serviceName: {{service.name}}-application
+          servicePort: 80

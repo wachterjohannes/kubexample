@@ -1,0 +1,44 @@
+kind: Deployment
+apiVersion: extensions/v1beta1
+metadata:
+  name: {{service.name}}-application
+spec:
+  revisionHistoryLimit: 3
+  template:
+    metadata:
+       labels:
+          app: {{service.name}}-application
+    spec:
+      containers:
+        - name: {{service.name}}-application
+          image: {{build.images["application/Dockerfile"]}}
+          resources:
+            limits:
+              memory: {{service.memory}}
+              cpu: {{service.cpu}}
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 80
+            timeoutSeconds: 1
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 80
+            timeoutSeconds: 1
+      imagePullSecrets:
+        - name: regcred
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: {{service.name}}-application
+spec:
+  ports:
+  -
+    name: http
+    port: 80
+    targetPort: 80
+    protocol: TCP
+  selector:
+    app: {{service.name}}-application
