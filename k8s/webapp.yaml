@@ -7,11 +7,15 @@ spec:
   template:
     metadata:
        labels:
-          app: kubexample
+          app: {{service.name}}
     spec:
       containers:
-        - name: kubexample
-          image: kubexample:latest
+        - name: {{service.name}}
+          image: {{build.images["application/Dockerfile"]}}
+          resources:
+            limits:
+              memory: {{service.memory}}
+              cpu: {{service.cpu}}
           livenessProbe:
             httpGet:
               path: /
@@ -28,7 +32,7 @@ spec:
 kind: Service
 apiVersion: v1
 metadata:
-  name: kubexample
+  name: {{service.name}}
 spec:
   ports:
   -
@@ -37,20 +41,20 @@ spec:
     targetPort: 80
     protocol: TCP
   selector:
-    app: kubexample
+    app: {{service.name}}
 ---
 kind: Ingress
 apiVersion: extensions/v1beta1
 metadata:
-  name: kubexample
+  name: {{service.name}}
   annotations:
     nginx.ingress.kubernetes.io/rewrite-target: /
 spec:
   rules:
-  - host: kubexample.localhost
+  - host: {{service.name}}.localhost
     http:
       paths:
-      - path: /
+      - path: /*
         backend:
-          serviceName: kubexample
+          serviceName: {{service.name}}
           servicePort: 80

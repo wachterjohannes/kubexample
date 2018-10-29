@@ -9,12 +9,19 @@ kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/mast
 
 ## Local deployment
 
-__Build application image:__
+__Install forge (https://forge.sh/docs/tutorials/quickstart):__
 ```bash
-docker build -t kubexample:latest application
+curl https://s3.amazonaws.com/datawire-static-files/forge/$(curl https://s3.amazonaws.com/datawire-static-files/forge/latest.url)/forge -o /tmp/forge
+chmod a+x /tmp/forge
+sudo mv /tmp/forge /usr/local/bin
 ```
 
-__Deploy application to cluster:__
+__Copy forge.yaml:__
 ```bash
-kubectl apply -f deployment
+cp forge.yaml.dist forge.yaml
+```
+
+__Deploy:__
+```bash
+forge deploy
 ```
